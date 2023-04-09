@@ -17,7 +17,8 @@ class ItemCategory extends Model
     ];
 
     protected $with = [
-        'items'
+        'items',
+        'parent'
     ];
 
     public function items(): HasMany

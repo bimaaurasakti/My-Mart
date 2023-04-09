@@ -70,22 +70,28 @@
                             >
                                 Cancel
                             </a>
-                            {{-- @if ($action == 'update')
-                                <form method="POST" action="{{ route('item-categories.destroy', $category) }}">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button
-                                        type="submit"
-                                        class="btn btn-outline-danger ms-2"
-                                    >
-                                        Delete
-                                    </button>
-                                </form>
-                            @endif --}}
+                            @if ($action == 'update')
+                                <button
+                                    id="button_form_delete"
+                                    class="btn btn-outline-danger ms-2"
+                                >
+                                    Delete
+                                </button>
+                            @endif
                         </div>
                     </form>
+                    @if ($action == 'update')
+                        <form id="form_delete" method="POST" action="{{ route('item-categories.destroy', $category) }}">
+                            @csrf
+                            @method('DELETE')
+                        </form>
+                    @endif
                 </div>
             </div>
         </div>
     </section>
+@endsection
+
+@section('custom-js')
+    <script src="{{ asset('js/item-category/form.js') }}"></script>
 @endsection
