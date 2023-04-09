@@ -2,13 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Dictionaries\FormActionDictionary;
-use App\Http\Requests\ItemCategoryRequest;
 use App\Models\ItemCategory;
 use Illuminate\Http\Request;
+use App\Services\ItemCategoryService;
+use App\Dictionaries\FormActionDictionary;
+use App\Http\Requests\ItemCategoryRequest;
 
 class ItemCategoryController extends Controller
 {
+    protected $itemCategoryService;
+
+    public function __construct(ItemCategoryService $itemCategoryService)
+    {
+        $this->itemCategoryService = $itemCategoryService;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -34,12 +42,12 @@ class ItemCategoryController extends Controller
      */
     public function store(ItemCategoryRequest $request)
     {
-        ItemCategory::create([
-            'parent_category_id' => $request->category,
-            'name' => $request->name,
-        ]);
-
-        return redirect()->route('item-categories.index')->with('success', 'Category created successfully.');
+        try {
+            $this->itemCategoryService->create($request);
+            return redirect()->route('item-categories.index')->with('success', 'Category created successfully.');
+        } catch (\Throwable $th) {
+            return redirect()->route('item-categories.index')->with('failed', 'Something when wrong.');
+        }
     }
 
     /**
@@ -69,14 +77,14 @@ class ItemCategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(ItemCategoryRequest $request, string $id)
     {
-        $item = ItemCategory::find($id);
-        $item->parent_category_id = $request->category ?? null;
-        $item->name = $request->name;
-        $item->save();
-
-        return back()->with('success', 'Category updated successfully.');
+        try {
+            $this->itemCategoryService->update($request, $id);
+            return redirect()->back()->with('success', 'Category updated successfully.');
+        } catch (\Throwable $th) {
+            return redirect()->route('item-categories.index')->with('failed', 'Something when wrong.');
+        }
     }
 
     /**
@@ -84,13 +92,11 @@ class ItemCategoryController extends Controller
      */
     public function destroy(string $id)
     {
-        $category = ItemCategory::with(['items', 'children'])->find($id);
-
-        if ($category->isUsed) {
-            return redirect()->route('item-categories.index')->with('failed', 'Category cannot be delete because still in use.');
+        try {
+            $this->itemCategoryService->delete($id);
+            return redirect()->route('item-categories.index')->with('success', 'Category deleted successfully.');
+        } catch (\Throwable $th) {
+            return redirect()->route('item-categories.index')->with('failed', $th->getMessage());
         }
-        $category->delete();
-
-        return redirect()->route('item-categories.index')->with('success', 'Category deleted successfully.');
     }
 }

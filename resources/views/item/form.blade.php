@@ -11,7 +11,7 @@
                         @csrf
 
                         @if ($action == 'update')
-                            @method('PUT')
+                            @method('PATCH')
                         @endif
 
                         <div class="mb-3">
@@ -82,21 +82,27 @@
                                 Cancel
                             </a>
                             @if ($action == 'update')
-                                <form method="POST" action="{{ route('items.destroy', $item) }}">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button
-                                        type="submit"
-                                        class="btn btn-outline-danger ms-2"
-                                    >
-                                        Delete
-                                    </button>
-                                </form>
+                                <button
+                                    id="button_form_delete"
+                                    class="btn btn-outline-danger ms-2"
+                                >
+                                    Delete
+                                </button>
                             @endif
                         </div>
                     </form>
+                    @if ($action == 'update')
+                        <form id="form_delete" method="POST" action="{{ route('items.destroy', $item) }}">
+                            @csrf
+                            @method('DELETE')
+                        </form>
+                    @endif
                 </div>
             </div>
         </div>
     </section>
+@endsection
+
+@section('custom-js')
+    <script src="{{ asset('js/item/form.js') }}"></script>
 @endsection

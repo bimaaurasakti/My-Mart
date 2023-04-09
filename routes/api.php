@@ -1,7 +1,8 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\ItemController;
+use App\Http\Controllers\API\ItemCategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +15,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+
+Route::name('api')->group(function () {
+    Route::prefix('items')->name('.items')->group(function () {
+        Route::get('/', [ItemController::class, 'index'])->name('.index');
+        Route::post('/', [ItemController::class, 'store'])->name('.store');
+        Route::match(['put', 'patch'], '{id}', [ItemController::class, 'update'])->name('.update');
+        Route::delete('{id}', [ItemController::class, 'destroy'])->name('.destroy');
+    });
+
+    Route::prefix('item-categories')->name('.items-categories')->group(function () {
+        Route::get('/', [ItemCategoryController::class, 'index'])->name('.index');
+        Route::post('/', [ItemCategoryController::class, 'store'])->name('.store');
+        Route::match(['put', 'patch'], '{id}', [ItemCategoryController::class, 'update'])->name('.update');
+        Route::delete('{id}', [ItemCategoryController::class, 'destroy'])->name('.destroy');
+    });
 });
+

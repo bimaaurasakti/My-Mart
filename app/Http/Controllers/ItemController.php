@@ -2,14 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Dictionaries\FormActionDictionary;
-use App\Http\Requests\ItemRequest;
 use App\Models\Item;
 use App\Models\ItemCategory;
 use Illuminate\Http\Request;
+use App\Http\Requests\ItemRequest;
+use App\Services\ItemService;
+use App\Dictionaries\FormActionDictionary;
 
 class ItemController extends Controller
 {
+    protected $itemService;
+
+    public function __construct(ItemService $itemService)
+    {
+        $this->itemService = $itemService;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -36,13 +44,12 @@ class ItemController extends Controller
      */
     public function store(ItemRequest $request)
     {
-        Item::create([
-            'item_category_id' => $request->category,
-            'name' => $request->name,
-            'price' => $request->price,
-        ]);
-
-        return redirect()->route('items.index')->with('success', 'Item created successfully.');
+        try {
+            $this->itemService->create($request);
+            return redirect()->route('items.index')->with('success', 'Item created successfully.');
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('failed', 'Something when wrong.');
+        }
     }
 
     /**
@@ -74,13 +81,12 @@ class ItemController extends Controller
      */
     public function update(ItemRequest $request, string $id)
     {
-        $item = Item::find($id);
-        $item->item_category_id = $request->category;
-        $item->name = $request->name;
-        $item->price = $request->price;
-        $item->save();
-
-        return back()->with('success', 'Item updated successfully.');
+        try {
+            $this->itemService->update($request, $id);
+            return redirect()->back()->with('success', 'Item updated successfully.');
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('failed', 'Something when wrong.');
+        }
     }
 
     /**
@@ -88,9 +94,11 @@ class ItemController extends Controller
      */
     public function destroy(string $id)
     {
-        $item = Item::find($id);
-        $item->delete();
-
-        return redirect()->route('items.index')->with('success', 'Item deleted successfully.');
+        try {
+            $this->itemService->delete($id);
+            return redirect()->route('items.index')->with('success', 'Item deleted successfully.');
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('failed', 'Something when wrong.');
+        }
     }
 }
