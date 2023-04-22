@@ -16,6 +16,7 @@ class ItemCategoryResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'id' => $this->id,
             'parentCategory' => $this->parent ? $this->parent->name : '-',
             'name' => $this->name,
             'createdAt' => Carbon::parse($this->created_at)->toDayDateTimeString(),

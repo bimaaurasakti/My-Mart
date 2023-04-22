@@ -42,6 +42,15 @@ class ItemCategoryController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        $category = ItemCategory::find($id);
+        return Response::statusOk(new ItemCategoryResource($category));
+    }
+
+    /**
      * Update the specified resource in storage.
      */
     public function update(ItemCategoryRequest $request, string $id)

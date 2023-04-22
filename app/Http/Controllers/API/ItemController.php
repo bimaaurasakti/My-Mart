@@ -42,6 +42,15 @@ class ItemController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        $item = Item::find($id);
+        return Response::statusOk(new ItemResource($item));
+    }
+
+    /**
      * Update the specified resource in storage.
      */
     public function update(ItemRequest $request, string $id)
